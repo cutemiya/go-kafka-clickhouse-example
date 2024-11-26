@@ -1,0 +1,12 @@
+{
+  "port": 80,
+  "queryService": "http://query-service",
+  "tripService": "http://trip-service",
+  "kafka": {
+    "brokers": ["kafka:9092"],
+    "topics": {
+      "insert": "insert"
+    }
+  },
+  "secret_key": "my_secret_key"
+}

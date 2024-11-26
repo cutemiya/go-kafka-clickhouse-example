@@ -1,0 +1,27 @@
+basePath: /
+definitions:
+  model.TripResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+host: localhost:82
+info:
+  contact: {}
+  description: Swagger for SOA
+  title: Swagger of API
+  version: "1.0"
+paths:
+  /trip:
+    post:
+      description: create empty trip
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TripResponse'
+      tags:
+      - docs
+swagger: "2.0"

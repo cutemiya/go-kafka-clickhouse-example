@@ -1,0 +1,103 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_USER: cutemiya
+      POSTGRES_DB: cutemiya_db
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ~/volumes/cutemiya_db:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  query-service:
+    build:
+      context: query-service
+      dockerfile: Dockerfile
+    ports:
+      - "81:81"
+    depends_on:
+      - clickhouse
+    networks:
+      - backend
+
+  trip-service:
+    build:
+      context: trip-service
+      dockerfile: Dockerfile
+    ports:
+      - "82:82"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  api-gateway:
+    build:
+      context: gateway-api
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - trip-service
+      - kafka
+      - zookeeper
+    networks:
+      - backend
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    working_dir: /bin
+    networks:
+      - backend
+
+  clickhouse:
+    image: yandex/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse  # Данные.
+      - clickhouse_configs:/etc/clickhouse-handler  # Конфигурации
+    depends_on:
+      - kafka
+    entrypoint: /bin/sh -c "exec /entrypoint.sh"
+    networks:
+      - backend
+
+volumes:
+  cache:
+    driver: local
+  clickhouse_data:
+  clickhouse_configs:
+
+networks:
+  backend:
+    driver: bridge

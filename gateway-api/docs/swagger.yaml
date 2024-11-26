@@ -1,0 +1,134 @@
+basePath: /
+definitions:
+  model.Offer:
+    properties:
+      arrival:
+        type: string
+      departure:
+        type: string
+      pnr:
+        type: string
+      price:
+        type: number
+      tripId:
+        type: integer
+    type: object
+  model.OfferPrice:
+    properties:
+      price:
+        type: number
+      tripId:
+        type: integer
+    type: object
+  model.TripResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+host: localhost:80
+info:
+  contact: {}
+  description: Swagger for SOA
+  title: Swagger of API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: ping
+      responses:
+        "200":
+          description: pong
+      tags:
+      - docs
+  /trip:
+    post:
+      description: create empty trip
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TripResponse'
+      tags:
+      - docs
+  /trip-book:
+    post:
+      consumes:
+      - application/json
+      description: Book trip
+      parameters:
+      - description: param
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Offer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      tags:
+      - docs
+  /trip/{tripId}/offer:
+    post:
+      consumes:
+      - application/json
+      description: push new offer to kafka topic
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: param
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Offer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      tags:
+      - docs
+  /trips:
+    get:
+      consumes:
+      - application/json
+      description: get all trips
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.OfferPrice'
+            type: array
+      tags:
+      - analytics
+  /trips/{tripId}:
+    get:
+      consumes:
+      - application/json
+      description: get trip by id
+      parameters:
+      - description: tripId
+        in: path
+        name: tripId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OfferPrice'
+      tags:
+      - analytics
+swagger: "2.0"

@@ -1,0 +1,42 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Swagger for SOA",
+        "title": "Swagger of API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:82",
+    "basePath": "/",
+    "paths": {
+        "/trip": {
+            "post": {
+                "description": "create empty trip",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "docs"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TripResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.TripResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

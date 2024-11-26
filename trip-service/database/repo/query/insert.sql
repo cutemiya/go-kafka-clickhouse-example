@@ -1,0 +1,1 @@
+insert into Trips(trip_status) values($1) returning id;
